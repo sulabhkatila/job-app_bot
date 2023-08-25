@@ -41,7 +41,6 @@ def main() -> None:
 
     # Multiprocessing the emails
     with multiprocessing.Manager() as manager:
-        print("Multiprcessing as manager")
         app_categories = manager.dict(
             {
                 "application": 0,
@@ -65,10 +64,10 @@ def main() -> None:
                     executor.submit(
                         process_email,
                         email,
-                        app_categories.copy(),
+                        app_categories,
                         new_entry_lock,
-                        category_locks.copy(),
-                        locked_range.copy(),
+                        category_locks,
+                        locked_range,
                         sheet_id,
                         sheet_name,
                     )

@@ -99,8 +99,6 @@ class GmailWorker:
             .execute()
         )
         messages = results.get("messages", [])
-        message_count = len(messages)
-        print(f"You've received {message_count} email(s) in the last {days} days")
         if not messages:
             print(f"No Emails found in the last {days} days.")
         return messages
@@ -124,8 +122,8 @@ class GmailWorker:
                 except:
                     match = sender
             if d["name"] == "Date":
-                date = d["value"]
-
+                date = d["value"][:31]
+                
         def get_body(payload):
             if "body" in payload and "data" in payload["body"]:
                 return payload["body"]["data"]
@@ -146,6 +144,8 @@ class GmailWorker:
             decoded_data = (
                 decoded_data.replace("\n", "").replace("\r", "").replace("\t", "")
             )
+
+            print(len(date))
 
             return {
                 "subject": subject,
