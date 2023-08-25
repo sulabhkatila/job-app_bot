@@ -29,7 +29,7 @@ def main() -> None:
     days = get_days()
 
     # Get all emails
-    emails = gmail_worker.get_messages(days, "read", "inbox")
+    emails = gmail_worker.get_messages(days, "unread", "inbox")
 
     # Creating the sheet
     sheets_worker.create_sheet("jobsheet")
@@ -78,12 +78,7 @@ def main() -> None:
             concurrent.futures.wait(results)
 
             # Print the details of the session
-            print("\n- - - - - - - - - - - - - - - - - -\n")
-            print(f"{sum(app_categories.values())} updates were made")
-            for c in app_categories:
-                if app_categories[c] > 0:
-                    print(f"{c.upper()}: {app_categories[c]}")
-            print("\n- - - - - - - - - - - - - - - - - -\n")
+            print_session_details(app_categories)
 
 
 def get_days():
@@ -217,7 +212,7 @@ def process_email(
                     category_locks[info["status"].lower().strip()].release()
 
                     # Mark the email read
-                    # gmail_worker.mark_read(details["id"].strip())
+                    gmail_worker.mark_read(details["id"].strip())
 
             else:
                 # Inform the user
