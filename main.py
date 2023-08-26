@@ -24,7 +24,7 @@ sheets_worker = SheetsWorker()
 processor = Processor(os.environ.get("API_KEY"))
 
 
-def main() -> None:
+def main():
     # Get user input
     days = get_days()
 
@@ -80,9 +80,15 @@ def main() -> None:
             print_session_details(app_categories)
 
 
-def get_days():
+def get_days() -> int:
     """
     Gets number of days from user
+
+    ARGS:
+        None
+    
+    RETURNS:
+        None
     """
     days = None
 
@@ -111,7 +117,22 @@ def process_email(
     locked_range,
     sheet_id,
     sheet_name,
-):
+) -> None:
+    """
+    Processes the emails and updates the spreadsheet
+
+    ARGS:
+        email: The email to process
+        app_categories: Shared resource to keep track of updates made
+        new_entry_lock: Lock for new entries
+        category_locks: Lock for updating each category update count
+        locked_range: Shared resouece to keep track of ranges currently being updated
+        sheet_id: Id of the google sheet
+        sheet_name: Name of the google sheet
+
+    RETURNS:
+        None
+    """
     try:
         details = gmail_worker.get_mail_details(email)
 
@@ -227,7 +248,16 @@ def process_email(
         logging.error(e)
 
 
-def print_session_details(app_categories):
+def print_session_details(app_categories: dict) -> None:
+    """
+    Prints the session details
+
+    ARGS:
+        app_categories: Dictionary that has tracked all the updates count
+    
+    RETURNS:
+        None
+    """
     print("\n- - - - - - - - - - - - - - - - - -\n")
     print(f"{sum(app_categories.values())} updates were made")
     for c in app_categories:

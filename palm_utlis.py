@@ -15,7 +15,7 @@ from nltk.corpus import stopwords
 
 
 class Processor:
-    def __init__(self, API_KEY):
+    def __init__(self, API_KEY: str):
         self.nlp = spacy.load("en_core_web_lg")
         self.sia = SentimentIntensityAnalyzer()
 
@@ -251,9 +251,9 @@ class Processor:
 
             info["company"] = self.extract_company_name(message)
             info["role"] = self.extract_role_name(message)
-            info["date"] = "X"  # will get updated while processing the email
+            info["date"] = "X"  # needs to get updated while processing the email
             info["notes"] = self.extract_notes(message)
-            info["email"] = "X"  # will get updated while processing the email
+            info["email"] = "X"  # needs to get updated while processing the email
             info["status"] = self.extract_status(message)
 
             return info

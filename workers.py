@@ -36,7 +36,7 @@ def get_service(service_type: str, version: str):
     """
     Returns the google api service object
 
-    PARAMS:
+    ARGS:
         type: type of service object (
                 gmail, sheets
                 )
@@ -46,7 +46,7 @@ def get_service(service_type: str, version: str):
                     )
 
     RETURNS:
-        Google api service object
+        googleapiclient.discovery.Resource: Google api service object
     """
 
     try:
@@ -76,9 +76,30 @@ def get_service(service_type: str, version: str):
 
 class GmailWorker:
     def __init__(self):
+        """
+        Initializes GmailWorker Class by creating serive object for 
+        gmail
+
+        ARGS:
+            None
+
+        RETURNS:
+            None
+        """
         self.service = get_service("gmail", "v1")
 
-    def get_messages(self, days: int, label: str = None, location: str = None):
+    def get_messages(self, days: int, label: str = None, location: str = None) -> list:
+        """
+        Returns all the relevant emails
+
+        ARGS:
+            days: Number of days to far into
+            label: Possible label associated with emails
+            location: Location in the gmail where to look for
+
+        RETURNS:
+            List of all the emails
+        """
         def generate_query(days: int, label: str, location: str) -> str:
             x_days_ago = (
                 datetime.datetime.now() - datetime.timedelta(days=days)
@@ -103,7 +124,16 @@ class GmailWorker:
             print(f"No Emails found in the last {days} days.")
         return messages
 
-    def get_mail_details(self, msg):
+    def get_mail_details(self, msg: dict) -> dict:
+        """
+        Parses the emails and returns all the details from the email
+
+        ARGS:
+            msg: The email
+
+        RETURNS:
+            Details of the email (Subject, ID, Sender, Receiver, Date, Message)
+        """
         # Call the Gmail API
         txt = self.service.users().messages().get(userId="me", id=msg["id"]).execute()
         payload = txt["payload"]
@@ -124,7 +154,7 @@ class GmailWorker:
             if d["name"] == "Date":
                 date = d["value"][:31]
                 
-        def get_body(payload):
+        def get_body(payload: dict) -> str:
             if "body" in payload and "data" in payload["body"]:
                 return payload["body"]["data"]
             elif "parts" in payload:
@@ -162,7 +192,7 @@ class GmailWorker:
         """
         Marks the email as read
 
-        PARAMS:
+        ARGS:
             message_id: id of the email
 
         RETURNS:
@@ -183,6 +213,15 @@ class GmailWorker:
 
 class SheetsWorker:
     def __init__(self):
+        """
+        Initializes the SheetsWorker class by creating a google service object for google sheets
+
+        ARGS:
+            None
+
+        RETURNS:
+            None
+        """
         self.service = get_service("sheets", "v4")
         self.nlp = spacy.load("en_core_web_lg")
 
@@ -190,7 +229,7 @@ class SheetsWorker:
         """
         Creates a Google sheet
 
-        PARAMS:
+        ARGS:
             title: name for the google sheet
 
         RETURNS:
@@ -231,7 +270,7 @@ class SheetsWorker:
         """
         Returns the details of the google sheets
 
-        PARAMS:
+        ARGS:
             None
 
         RETURNS:
@@ -248,7 +287,7 @@ class SheetsWorker:
         """
         Updates the application sheet detail file (app_sheet.txt)
 
-        PARAMS:
+        ARGS:
             n: The number of new columns added in the sheets
 
         RETURNS:
@@ -273,7 +312,7 @@ class SheetsWorker:
         """
         Returns the existing range for given values
 
-        PARAMS:
+        ARGS:
             company: id of the email
 
         RETURNS:
@@ -307,12 +346,11 @@ class SheetsWorker:
                         )
                         > 0.8
                     ):
-                        # # #
                         row = r + 2
                         col_end = sheet_details[-1][-2]
                         range_val = f"A{row}:{col_end}{row}"
 
-                        return range_val  # previously :: return (r + 2)
+                        return range_val 
             return None
 
         # except HttpError as error:
@@ -330,7 +368,7 @@ class SheetsWorker:
         """
         Updates the sheet with given data
 
-        PARAMS:
+        ARGS:
             range_name: the range to update
             value_input_option: input value for data interpretation
             val: the values to update the range with
@@ -339,10 +377,7 @@ class SheetsWorker:
             None
         """
 
-        # range_name = A1: E1
-        # pylint: disable=maybe-no-member
         try:
-            # service = build("sheets", "v4", credentials=creds)
             values = [val]
             body = {"values": values}
             result = (
@@ -365,7 +400,7 @@ class SheetsWorker:
         """
         Returns the values in the given range
 
-        PARAMS:
+        ARGS:
             range: range to read values from
 
         RETURNS:
